@@ -13,6 +13,7 @@ import javax.swing.AbstractAction;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JFileChooser;
@@ -27,6 +28,7 @@ public class Interface extends JFrame {
 	private static File fileOpen;
 	private JLabel lblPath;
 	private JLabel lblFileInfo;
+	private List<String[]> cards;
 
 	/**
 	 * Launch the application.
@@ -82,6 +84,17 @@ public class Interface extends JFrame {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				fileOpen = fc.getSelectedFile();
 				lblPath.setText("File: "+fileOpen.getPath());
+				try {
+					psr = new Parser(fileOpen);
+				} catch (InvalidFileFormatException e1) {
+					lblPath.setText("Wrong file format!");
+				}
+			}
+			cards = psr.parse();
+			for(String[] card:cards){
+				for(String part:card){
+					System.out.println(part);
+				}
 			}
 		}
 	}

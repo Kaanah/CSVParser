@@ -15,7 +15,7 @@ public class Parser {
 			throw new InvalidFileFormatException();
 	}
 
-	public List parse() {
+	public List<String[]> parse() {
 		CSVReader reader;
 		List<String[]> entries = null;
 		try {
