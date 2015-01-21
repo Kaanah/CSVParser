@@ -20,6 +20,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.JTextPane;
+import javax.swing.JTextArea;
+import java.awt.Font;
+import javax.swing.JScrollPane;
+import java.awt.Toolkit;
 
 public class Interface extends JFrame {
 
@@ -38,6 +42,7 @@ public class Interface extends JFrame {
 	private JLabel lblBottom;
 	private JTextPane txtpnCards;
 	private String cardsString = "";
+	private JScrollPane scrollPane;
 
 	/**
 	 * Launch the application.
@@ -59,14 +64,14 @@ public class Interface extends JFrame {
 	 * Create the frame.
 	 */
 	public Interface() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage("Icon.png"));
 		setTitle("Deckbox parser");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 779, 776);
+		setBounds(100, 100, 541, 710);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		contentPane.setLayout(new MigLayout("", "[grow][32.00][][][]",
-				"[][][][grow]"));
+		contentPane.setLayout(new MigLayout("", "[grow][32.00][][][]", "[][][][grow][grow]"));
 
 		JButton btnOpenFile = new JButton("Open file...");
 		btnOpenFile.setAction(action);
@@ -93,10 +98,14 @@ public class Interface extends JFrame {
 
 		lblFileInfo = new JLabel("");
 		contentPane.add(lblFileInfo, "flowx,cell 0 2 5 1");
-
-		txtpnCards = new JTextPane();
-		txtpnCards.setText("Copy from here");
-		contentPane.add(txtpnCards, "cell 0 3 5 1,grow");
+				
+				scrollPane = new JScrollPane();
+				contentPane.add(scrollPane, "cell 0 3 5 2,grow");
+				
+						txtpnCards = new JTextPane();
+						scrollPane.setViewportView(txtpnCards);
+						txtpnCards.setFont(new Font("Tahoma", Font.PLAIN, 13));
+						txtpnCards.setText("Copy from here");
 
 		fc = new JFileChooser();
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -129,14 +138,11 @@ public class Interface extends JFrame {
 				for (int ii = 0; ii < cards.get(i).length; ii++)
 					if (ii == 0){
 						cardsString = cardsString+cards.get(i)[ii] + "x ";
-						System.out.print(cards.get(i)[ii] + "x ");
 					}
 					else if (ii == 1){
 						cardsString = cardsString+cards.get(i)[ii];
-						System.out.print(cards.get(i)[ii]);
 					}
 				cardsString = cardsString+"\n";
-				System.out.println();
 			}
 			txtpnCards.setText(cardsString);
 		}
