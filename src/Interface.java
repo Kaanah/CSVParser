@@ -4,18 +4,29 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
 import net.miginfocom.swing.MigLayout;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.AbstractAction;
-import java.awt.event.ActionEvent;
-import javax.swing.Action;
 
+import java.awt.event.ActionEvent;
+import java.io.File;
+
+import javax.swing.Action;
+import javax.swing.JFileChooser;
 
 public class Interface extends JFrame {
 
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private final Action action = new SwingAction();
+	private Parser psr;
+	private static JFileChooser fc;
+	private static File fileOpen;
+	private JLabel lblPath;
+	private JLabel lblFileInfo;
 
 	/**
 	 * Launch the application.
@@ -49,19 +60,29 @@ public class Interface extends JFrame {
 		btnOpenFile.setAction(action);
 		contentPane.add(btnOpenFile, "cell 0 0");
 		
-		JLabel lblPath = new JLabel("");
+		lblPath = new JLabel("");
 		contentPane.add(lblPath, "cell 1 0");
 		
-		JLabel lblFileInfo = new JLabel("File info:");
+		lblFileInfo = new JLabel("File info:");
 		contentPane.add(lblFileInfo, "cell 0 1");
+		
+		fc = new JFileChooser();
+		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	}
 
 	private class SwingAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
 		public SwingAction() {
 			putValue(NAME, "Open file...");
 			putValue(SHORT_DESCRIPTION, "Opens .csv file for parsing");
 		}
 		public void actionPerformed(ActionEvent e) {
+			int returnVal = fc.showOpenDialog(Interface.this);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				fileOpen = fc.getSelectedFile();
+				lblPath.setText("File: "+fileOpen.getPath());
+			}
 		}
 	}
 }
