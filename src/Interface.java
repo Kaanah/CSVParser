@@ -3,7 +3,8 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.text.StyledDocument;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -45,7 +46,7 @@ public class Interface extends JFrame {
 	private JTextPane txtpnCards;
 	private String cardsString = "";
 	private JScrollPane scrollPane;
-	private StyledDocument doc;
+	private Document doc;
 
 	/**
 	 * Launch the application.
@@ -97,7 +98,7 @@ public class Interface extends JFrame {
 		lblBottom = new JLabel("Bottom");
 		contentPane.add(lblBottom, "cell 4 0");
 
-		lblPath = new JLabel("");
+		lblPath = new JLabel("You can drag and drop file into the window");
 		contentPane.add(lblPath, "cell 0 1 5 1");
 
 		lblFileInfo = new JLabel("");
@@ -110,7 +111,8 @@ public class Interface extends JFrame {
 		scrollPane.setViewportView(txtpnCards);
 		txtpnCards.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		txtpnCards.setText("Copy from here");
-
+		doc = txtpnCards.getDocument();
+		
 		new FileDrop(contentPane, new FileDrop.Listener() {
 			public void filesDropped(java.io.File[] files) {
 				for (File file : files) {
@@ -156,6 +158,7 @@ public class Interface extends JFrame {
 	}
 
 	private void fillTextPane(List<String[]> cards) {
+		txtpnCards.setText("");
 		lblFileInfo.setText("Loaded " + cards.size() + " lines!");
 		for (int i = (Integer) spnHeader.getValue(); i < cards.size()
 				- (Integer) spnBottom.getValue(); i++) {
@@ -167,6 +170,12 @@ public class Interface extends JFrame {
 						cardsString = cardsString + cards.get(i)[ii];
 					}
 				cardsString = cardsString + "\n";
+				try {
+					doc.insertString(doc.getLength(), cardsString, null);
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
+				cardsString = "";
 			} else {
 				for (int ii = 0; ii < cards.get(i).length; ii++)
 					if (ii == 0) {
@@ -175,8 +184,13 @@ public class Interface extends JFrame {
 						cardsString = cardsString + cards.get(i)[ii];
 					}
 				cardsString = cardsString + "\n";
+				try {
+					doc.insertString(doc.getLength(), cardsString, null);
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
+				cardsString = "";
 			}
-			txtpnCards.setText(cardsString);
 		}
 	}
 }
