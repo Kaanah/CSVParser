@@ -3,6 +3,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.StyledDocument;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -19,8 +20,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.JTextPane;
+
 import java.awt.Font;
+
 import javax.swing.JScrollPane;
+
 import java.awt.Toolkit;
 
 public class Interface extends JFrame {
@@ -41,6 +45,7 @@ public class Interface extends JFrame {
 	private JTextPane txtpnCards;
 	private String cardsString = "";
 	private JScrollPane scrollPane;
+	private StyledDocument doc;
 
 	/**
 	 * Launch the application.
@@ -62,14 +67,15 @@ public class Interface extends JFrame {
 	 * Create the frame.
 	 */
 	public Interface() {
-		setIconImage(Toolkit.getDefaultToolkit().getImage("Icon.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(Interface.class.getResource("/com/test/icon/mtg_icon.png")));
 		setTitle("Deckbox parser");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 541, 710);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		contentPane.setLayout(new MigLayout("", "[grow][32.00][][][]", "[][][][grow][grow]"));
+		contentPane.setLayout(new MigLayout("", "[grow][32.00][][][]",
+				"[][][][grow][grow]"));
 
 		JButton btnOpenFile = new JButton("Open file...");
 		btnOpenFile.setAction(action);
@@ -96,14 +102,28 @@ public class Interface extends JFrame {
 
 		lblFileInfo = new JLabel("");
 		contentPane.add(lblFileInfo, "flowx,cell 0 2 5 1");
-				
-				scrollPane = new JScrollPane();
-				contentPane.add(scrollPane, "cell 0 3 5 2,grow");
-				
-						txtpnCards = new JTextPane();
-						scrollPane.setViewportView(txtpnCards);
-						txtpnCards.setFont(new Font("Tahoma", Font.PLAIN, 13));
-						txtpnCards.setText("Copy from here");
+
+		scrollPane = new JScrollPane();
+		contentPane.add(scrollPane, "cell 0 3 5 2,grow");
+
+		txtpnCards = new JTextPane();
+		scrollPane.setViewportView(txtpnCards);
+		txtpnCards.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		txtpnCards.setText("Copy from here");
+
+		new FileDrop(contentPane, new FileDrop.Listener() {
+			public void filesDropped(java.io.File[] files) {
+				for (File file : files) {
+					try {
+						psr = new Parser(file);
+					} catch (InvalidFileFormatException e1) {
+						lblPath.setText("Wrong file format!");
+					}
+					cards = psr.parse();
+					fillTextPane(cards);
+				}
+			}
+		});
 
 		fc = new JFileChooser();
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -130,17 +150,31 @@ public class Interface extends JFrame {
 				}
 			}
 			cards = psr.parse();
-			lblFileInfo.setText("Loaded " + cards.size() + " lines!");
-			for (int i = (Integer) spnHeader.getValue(); i < cards.size()
-					- (Integer) spnBottom.getValue(); i++) {
+			fillTextPane(cards);
+
+		}
+	}
+
+	private void fillTextPane(List<String[]> cards) {
+		lblFileInfo.setText("Loaded " + cards.size() + " lines!");
+		for (int i = (Integer) spnHeader.getValue(); i < cards.size()
+				- (Integer) spnBottom.getValue(); i++) {
+			if (!cards.get(2)[1].matches("^\\d+")) {
 				for (int ii = 0; ii < cards.get(i).length; ii++)
-					if (ii == 0){
-						cardsString = cardsString+cards.get(i)[ii] + "x ";
+					if (ii == 0) {
+						cardsString = cardsString + cards.get(i)[ii] + "x ";
+					} else if (ii == 1) {
+						cardsString = cardsString + cards.get(i)[ii];
 					}
-					else if (ii == 1){
-						cardsString = cardsString+cards.get(i)[ii];
+				cardsString = cardsString + "\n";
+			} else {
+				for (int ii = 0; ii < cards.get(i).length; ii++)
+					if (ii == 0) {
+						cardsString = cardsString + cards.get(i)[ii] + "x ";
+					} else if (ii == 2) {
+						cardsString = cardsString + cards.get(i)[ii];
 					}
-				cardsString = cardsString+"\n";
+				cardsString = cardsString + "\n";
 			}
 			txtpnCards.setText(cardsString);
 		}
