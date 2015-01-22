@@ -118,6 +118,7 @@ public class Interface extends JFrame {
 				for (File file : files) {
 					try {
 						psr = new Parser(file);
+						lblPath.setText("File: " + file.getPath());
 					} catch (InvalidFileFormatException e1) {
 						lblPath.setText("Wrong file format!");
 					}
